@@ -12,17 +12,15 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.commons.io.FileUtils;
+import com.activeandroid.query.Select;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     static final int EDIT_ITEM_REQUEST = 1;
 
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    List<Item> items;
+    ArrayAdapter<Item> itemsAdapter;
     ListView lvItems;
 
     @Override
@@ -30,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lvItems = (ListView)findViewById(R.id.lvItems);
-        readItems();
+        items = new Select().from(Item.class).execute();
         itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         lvItems.setAdapter(itemsAdapter);
         setupListViewListeners();
@@ -60,21 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void onAddItem(View view) {
         EditText etNewItem = (EditText)findViewById(R.id.etNewItem);
-        String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+        Item item = new Item(etNewItem.getText().toString());
+        item.save();
+        itemsAdapter.add(item);
         etNewItem.setText("");
-        writeItems();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
         if (resultCode == RESULT_OK && requestCode == EDIT_ITEM_REQUEST) {
             int listPosition = data.getIntExtra("listPosition", -1);
             String itemText = data.getStringExtra("itemText");
-            items.set(listPosition, itemText);
+            Item item = items.get(listPosition);
+            item.text = itemText;
+            item.save();
             itemsAdapter.notifyDataSetChanged();
-            writeItems();
         }
     }
 
@@ -82,9 +80,10 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
+                Item itemToDelete = (Item)adapter.getItemAtPosition(pos);
+                itemToDelete.delete();
                 items.remove(pos);
                 itemsAdapter.notifyDataSetChanged();
-                writeItems();
                 return true;
             }
         });
@@ -97,25 +96,5 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(i, EDIT_ITEM_REQUEST);
             }
         });
-    }
-
-    private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            items = new ArrayList<>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            items = new ArrayList<>();
-        }
-    }
-
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
