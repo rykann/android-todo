@@ -4,7 +4,7 @@
 
 Submitted by: **Ryan Kannegiesser**
 
-Time spent: **3** hours spent in total
+Time spent: **6** hours spent in total
 
 ## User Stories
 
@@ -41,6 +41,13 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 Building this app was pretty straightforward. The CodePath guide on
 how to start an activity and pass data between activities was useful,
 as were the Android developer docs.
+
+**Update 9/20/2015:**
+When I switched to SQLite for persistence, I spent some time looking at
+the different ORMs listed in the CodePath guide, as well as some others.
+There didn't seem to be a clear winner, and many of the projects weren't
+very active. I decided to go with [ActiveAndroid](https://github.com/pardom/ActiveAndroid)
+for its popularity and decent documentation.
 
 ## License
 
