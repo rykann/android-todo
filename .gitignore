@@ -27,7 +27,7 @@ proguard/
 *.log
 
 # Android Studio iml file
-/*.iml
+*.iml
 
 # Android Studio project files (gradle is the source of truth)
 .idea
